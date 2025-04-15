@@ -127,7 +127,7 @@ uv sync
 uv run server.py
 ```
 
-### STDIO 方式 
+#### 2. STDIO 方式 
 
 将以下内容添加到你的 mcp client 工具中，例如cursor、cline等
 
