@@ -3,6 +3,7 @@
 
 # easyMcp
 ### 仅需两步，使开发者快速的搭建一个易扩展且支持stdio与sse两种启动模式的mcp server服务框架。
+帮忙点个赞啊，朋友们。
 
 ## 使用手册
 
@@ -157,4 +158,8 @@ mcp json 如下
   }
 }    
 ```
+
+## 效果图
+![image](https://github.com/user-attachments/assets/72854681-16ad-4dc8-a095-5e6e63e07deb)
+
 
