@@ -125,7 +125,7 @@ uv sync
 uv run server.py
 ```
 
-### STDIO Mode 
+#### 2. STDIO Mode 
 
 Add the following content to your mcp client tool, such as cursor, cline, etc.
 
@@ -155,3 +155,6 @@ mcp json as follows
     }
   }
 }    
+
+## Effect diagram
+![image](https://github.com/user-attachments/assets/72854681-16ad-4dc8-a095-5e6e63e07deb)
