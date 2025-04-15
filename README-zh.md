@@ -2,14 +2,14 @@
 [![English](https://img.shields.io/badge/English-Click-yellow)](README.md)
 
 # easyMcp
-### Just two steps to help developers quickly build an extensible mcp server framework that supports both stdio and SSE startup modes.
+### 仅需两步，使开发者快速的搭建一个易扩展且支持stdio与sse两种启动模式的mcp server服务框架。
 
-## User Manual
+## 使用手册
 
-### 1. Step One [Optional] Define Required Configuration
-Define your project's required configuration in src/config/.env, for example, database configuration:
+### 1. 第一步【可选】定义所需的配置信息
+在 src/config/.env 定义自己项目所需配置信息，例如需要数据库配置：
 ```aiignore
- # MySQL Database Configuration
+ # MySQL数据库配置
 MYSQL_HOST=192.168.3.229
 MYSQL_PORT=3306
 MYSQL_USER=root
@@ -18,15 +18,16 @@ MYSQL_DATABASE=a_llm
 MYSQL_ROLE=admin
 ```
 
-### 2. Step Two Create Your Own Tools
-Add your own tool classes in the src/handles directory, refer to the example.py sample
 
-* Inherit from BaseHandler
-* Define the name property, which is the tool's name
-* Define the description property, which is the tool's description
-* Implement the get_tool_description method, which tells the mcp client what your tool does
-* Implement the run_tool method, which is called by the mcp client to execute your tool's logic
-* Reference the new tool in __init__.py
+### 2. 第二步 创建自己的工具
+在 src/handles 目录下新增自己的工具类，参考 example.py 示例
+
+* 继承 BaseHandler 
+* 定义 name 属性，及工具的名称
+* 定义 description 属性，及工具的描述
+* 实现 get_tool_description 方法，这是告诉mcp client 你有一个什么作用的工具
+* 实现 run_tool 方法，这是mcp client 调用工具的方法，在这里实现你工具的逻辑
+* 将新增的工具在 __init__.py 引用
 
 example.py
 ```aiignore
@@ -68,14 +69,14 @@ class Example(BaseHandler):
 
                 text = arguments["text"]
 
-                # Reference configuration information
+                # 引用配置信息
                 config = get_config()
 
                 ## todo something
 
                 result = "xxxxxxx"
 
-                # Join all results with commas
+                # 用逗号连接所有结果
                 return [TextContent(type="text", text=','.join(result))]
 
             except Exception as e:
@@ -93,53 +94,53 @@ __all__ = [
 ]
 ```
 
-### 3. Startup
-Currently, this framework supports two startup modes: stdio and SSE.
+### 3. 启动
+目前该框架支持两种模式的启动，stdio 和 sse 。
 
-#### 1. SSE Mode
+#### 1. SSE 方式
 
-- Start the service using uv
+- 使用 uv 启动服务
 
-Add the following content to your mcp client tool, such as cursor, cline, etc.
+将以下内容添加到你的 mcp client 工具中，例如cursor、cline等
 
-mcp json as follows
-```
+mcp json 如下
+````
 {
   "mcpServers": {
-    "easyMcp": {
-      "name": "easyMcp",
+    "operateMysql": {
+      "name": "operateMysql",
       "description": "",
       "isActive": true,
       "baseUrl": "http://localhost:9000/sse"
     }
   }
 }
-```
+````
 
-Startup command
+启动命令
 ```
-# Download dependencies
+# 下载依赖
 uv sync
 
-# Start
+# 启动
 uv run server.py
 ```
 
-### STDIO Mode 
+### STDIO 方式 
 
-Add the following content to your mcp client tool, such as cursor, cline, etc.
+将以下内容添加到你的 mcp client 工具中，例如cursor、cline等
 
-mcp json as follows
+mcp json 如下
 ```
 {
   "mcpServers": {
-      "easyMcp": {
+      "operateMysql": {
         "isActive": true,
-        "name": "easyMcp",
+        "name": "operateMysql",
         "command": "uv",
         "args": [
           "--directory",
-          "G:\\python\\mysql_mcp\\src",  # Replace this with your project path
+          "G:\\python\\mysql_mcp\\src",  # 这里需要替换为你的项目路径
           "run",
           "server.py",
           "--stdio"
@@ -155,3 +156,5 @@ mcp json as follows
     }
   }
 }    
+```
+

@@ -1,0 +1,12 @@
+[project]
+name = "easy-mcp"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.0.0",
+    "python-dotenv>=1.1.0",
+    "starlette>=0.46.1",
+    "uvicorn>=0.34.0",
+]
