@@ -2,6 +2,8 @@ import asyncio
 import uvicorn
 
 from typing import Sequence
+
+from mcp import types
 from mcp.server.sse import SseServerTransport
 
 from mcp.server import Server
@@ -11,9 +13,21 @@ from starlette.applications import Starlette
 from starlette.routing import Route, Mount
 
 from handles.base import ToolRegistry
+from prompts.BasePrompt import PromptRegistry
 
 # 初始化服务器
 app = Server("easyMcp")
+
+
+@app.list_prompts()
+async def handle_list_prompts() -> list[types.Prompt]:
+    return PromptRegistry.get_all__prompts()
+
+
+@app.get_prompt()
+async def handle_get_prompt(name: str, arguments: dict[str, str] | None) -> types.GetPromptResult:
+   prompt = PromptRegistry.get_prompt(name)
+   return await prompt.run_prompt(arguments)
 
 
 @app.list_tools()
