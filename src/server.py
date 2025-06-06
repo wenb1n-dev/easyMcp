@@ -1,23 +1,29 @@
 import asyncio
 import uvicorn
+import contextlib
 
-from typing import Sequence
+from collections.abc import AsyncIterator
+
+from typing import Sequence, Dict, Any
 
 from mcp import types
 from mcp.server.sse import SseServerTransport
 
-from mcp.server import Server
+from mcp.server.lowlevel import Server
+from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
 from mcp.types import  Tool, TextContent
+from pydantic import AnyUrl
 
 from starlette.applications import Starlette
 from starlette.routing import Route, Mount
+from starlette.types import Scope, Receive, Send
 
+from config.event_store import InMemoryEventStore
 from handles.base import ToolRegistry
 from prompts.BasePrompt import PromptRegistry
 
 # 初始化服务器
 app = Server("easyMcp")
-
 
 @app.list_prompts()
 async def handle_list_prompts() -> list[types.Prompt]:
@@ -25,7 +31,7 @@ async def handle_list_prompts() -> list[types.Prompt]:
 
 
 @app.get_prompt()
-async def handle_get_prompt(name: str, arguments: dict[str, str] | None) -> types.GetPromptResult:
+async def handle_get_prompt(name: str, arguments: Dict[str, Any] | None) -> types.GetPromptResult:
    prompt = PromptRegistry.get_prompt(name)
    return await prompt.run_prompt(arguments)
 
@@ -38,7 +44,7 @@ async def list_tools() -> list[Tool]:
     return ToolRegistry.get_all_tools()
 
 @app.call_tool()
-async def call_tool(name: str, arguments: dict) -> Sequence[TextContent]:
+async def call_tool(name: str, arguments: Dict[str, Any]) -> Sequence[TextContent]:
     """调用指定的工具执行操作
     
     Args:
@@ -105,6 +111,34 @@ def run_sse():
     )
     uvicorn.run(starlette_app, host="0.0.0.0", port=9000)
 
+def run_streamable_http(json_response: bool):
+    event_store = InMemoryEventStore()
+
+    session_manager = StreamableHTTPSessionManager(
+        app=app,
+        event_store=event_store,
+        json_response=json_response,
+    )
+
+    async def handle_streamable_http(
+            scope: Scope, receive: Receive, send: Send
+    ) -> None:
+        await session_manager.handle_request(scope, receive, send)
+
+    @contextlib.asynccontextmanager
+    async def lifespan(app: Starlette) -> AsyncIterator[None]:
+        async with session_manager.run():
+            yield
+
+
+    starlette = Starlette(
+        debug=True,
+        routes=[
+            Mount("/mcp", app=handle_streamable_http)
+        ],
+        lifespan=lifespan,
+    )
+    uvicorn.run(starlette, host="0.0.0.0", port=3000)
 
 if __name__ == "__main__":
     import sys
@@ -113,6 +147,9 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--stdio":
         # 标准输入输出模式
         asyncio.run(run_stdio())
-    else:
-        # 默认 SSE 模式
+    elif len(sys.argv) > 1 and sys.argv[1] == "--sse":
+        # SSE 模式
         run_sse()
+    else:
+        # Streamable Http 模式
+        run_streamable_http(False)

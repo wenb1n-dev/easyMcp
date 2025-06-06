@@ -3,7 +3,7 @@ from typing import Dict, Any
 from mcp import GetPromptResult
 from mcp.types import Prompt, PromptArgument, TextContent, PromptMessage
 
-from prompts.BasePrompt import BasePrompt
+from .BasePrompt import BasePrompt
 
 
 class MysqlExample(BasePrompt):

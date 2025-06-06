@@ -2,7 +2,7 @@
 [![English](https://img.shields.io/badge/English-Click-yellow)](README.md)
 
 # easyMcp
-### 仅需两步，使开发者快速的搭建一个易扩展且支持stdio与sse两种启动模式的mcp server服务框架。
+### 仅需两步，使开发者快速的搭建一个易扩展且支持Model Context Protocol (MCP) 所有传输模式（STDIO、SSE、Streamable Http）的mcp server服务框架。
 帮忙点个赞啊，朋友们。
 
 ## 使用手册
@@ -96,9 +96,9 @@ __all__ = [
 ```
 
 ### 3. 启动
-目前该框架支持两种模式的启动，stdio 和 sse 。
+目前该框架支持Model Context Protocol (MCP) 所有传输模式（STDIO、SSE、Streamable Http） 。
 
-#### 1. SSE 方式
+#### 1. Streamable Http 方式
 
 - 使用 uv 启动服务
 
@@ -108,8 +108,40 @@ mcp json 如下
 ````
 {
   "mcpServers": {
-    "operateMysql": {
-      "name": "operateMysql",
+    "easyMcp": {
+      "name": "easyMcp",
+      "type": "streamableHttp",
+      "description": "",
+      "isActive": true,
+      "baseUrl": "http://localhost:3000/mcp/"
+    }
+  }
+}
+````
+
+启动命令
+```
+# 下载依赖
+uv sync
+
+# 启动
+uv run src/server.py
+
+```
+
+
+#### 2. SSE 方式
+
+- 使用 uv 启动服务
+
+将以下内容添加到你的 mcp client 工具中，例如cursor、cline等
+
+mcp json 如下
+````
+{
+  "mcpServers": {
+    "easyMcp": {
+      "name": "easyMcp",
       "description": "",
       "isActive": true,
       "baseUrl": "http://localhost:9000/sse"
@@ -124,10 +156,10 @@ mcp json 如下
 uv sync
 
 # 启动
-uv run server.py
+uv run src/server.py --sse
 ```
 
-#### 2. STDIO 方式 
+#### 3. STDIO 方式 
 
 将以下内容添加到你的 mcp client 工具中，例如cursor、cline等
 
